@@ -1,0 +1,40 @@
+name: Compile and Push Image
+description: 'Compile docker image and push with to ECR'
+
+inputs:
+  repository:
+    required: true
+    type: string
+  dockerfile:
+    required: false
+    type: string
+    default: 'Dockerfile'
+  build_path:
+    required: false
+    type: string
+    default: '.'
+outputs:
+  ecr_url:
+    description: "The first output string"
+    value: ${{ steps.build_push.outputs.ECR_URL }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Login to Amazon ECR
+      id: login_ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - id: build_push
+      name: Build, tag, and push docker image to Amazon ECR
+      shell: bash
+      env:
+        REGISTRY: ${{ steps.login_ecr.outputs.registry }}
+        REPOSITORY: ${{ inputs.repository }}
+        IMAGE_TAG: ${{ github.sha }}
+        DOCKERFILE: ${{ inputs.dockerfile }}
+        BUILD_PATH: ${{ inputs.build_path }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f DOCKERFILE $BUILD_PATH
+        docker push $REGISTRY/$REPOSITORY --all-tags
+        echo "ECR_URL=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
