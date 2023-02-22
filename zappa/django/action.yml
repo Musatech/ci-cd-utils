@@ -1,5 +1,6 @@
 name: Code Artifact URL
 description: 'Mount Code Artifact URL'
+
 inputs:
   ecr_url:
     description: "ECR URL of image to set in zappa"
@@ -7,37 +8,54 @@ inputs:
   migrate:
     description: "Runs migrate"
     required: false
-    type: boolean 
-    default: false
+    default: ''
   collect_static:
     description: "Runs collect-static"
     required: false
-    type: boolean 
-    default: false
+    default: ''
+  AWS_ACCESS_KEY_ID:
+    description: "Name of repository on ecr"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "If use a custom dockerfile"
+    required: false
+    default: 'Dockerfile'
+  AWS_REGION:
+    description: "Pass custom parameters to build"
+    required: false
+    default: 'us-east-1'
 
 runs:
   using: "composite"
   steps:
-    - name: Install Zappa
-      shell: bash
-      run:
-        pip install `cat requirements.txt | grep zappa`
-
     - name: Update zappa image
       shell: bash
       env:
         REGISTRY_URL: ${{ inputs.ecr_url }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ inputs.AWS_REGION }}
       run:
-        zappa update stg -d $REGISTRY_URL
+        docker run -e AWS_DEFAULT_REGION=$AWS_REGION \
+                   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                   $REGISTRY_URL zappa update stg -d $REGISTRY_URL
 
-    - name: Run migrate
-      shell: bash
-      if: inputs.migrate
-      run:
-        zappa manage stg migrate
+    # - name: Update zappa image
+    #   shell: bash
+    #   env:
+    #     REGISTRY_URL: ${{ inputs.ecr_url }}
+    #   run:
+    #     zappa update stg -d $REGISTRY_URL
 
-    - name: Run collect static
-      shell: bash
-      if: inputs.collect_static
-      run:
-        zappa manage stg "collectstatic --noinput"
+    # - name: Run migrate
+    #   shell: bash
+    #   if: inputs.migrate
+    #   run:
+    #     zappa manage stg migrate
+
+    # - name: Run collect static
+    #   shell: bash
+    #   if: inputs.collect_static
+    #   run:
+    #     zappa manage stg "collectstatic --noinput"
