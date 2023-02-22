@@ -35,6 +35,6 @@ runs:
         DOCKERFILE: ${{ inputs.dockerfile }}
         BUILD_PATH: ${{ inputs.build_path }}
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f DOCKERFILE $BUILD_PATH
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f $DOCKERFILE $BUILD_PATH
         docker push $REGISTRY/$REPOSITORY --all-tags
         echo "ECR_URL=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
