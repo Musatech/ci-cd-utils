@@ -2,17 +2,12 @@ name: Code Artifact URL
 description: 'Mount Code Artifact URL'
 
 inputs:
-  ecr_url:
+  command:
+    description: "Run command"
+    required: true
+  REGISTRY_URL:
     description: "ECR URL of image to set in zappa"
     required: true
-  migrate:
-    description: "Runs migrate"
-    required: false
-    default: ''
-  collect_static:
-    description: "Runs collect-static"
-    required: false
-    default: ''
   AWS_ACCESS_KEY_ID:
     description: "AWS_ACCESS_KEY_ID"
     required: true
@@ -31,32 +26,14 @@ runs:
     - name: Update zappa image
       shell: bash
       env:
-        REGISTRY_URL: ${{ inputs.ecr_url }}
+        REGISTRY_URL: ${{ inputs.REGISTRY_URL }}
         AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ inputs.AWS_REGION }}
+        COMMAND: ${{ inputs.command }}
       run: |
         docker run -e AWS_DEFAULT_REGION=$AWS_REGION \
                    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
                    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                    --entrypoint '' $REGISTRY_URL \
-                   zappa update stg -d $REGISTRY_URL
-
-    # - name: Update zappa image
-    #   shell: bash
-    #   env:
-    #     REGISTRY_URL: ${{ inputs.ecr_url }}
-    #   run:
-    #     zappa update stg -d $REGISTRY_URL
-
-    # - name: Run migrate
-    #   shell: bash
-    #   if: inputs.migrate
-    #   run:
-    #     zappa manage stg migrate
-
-    # - name: Run collect static
-    #   shell: bash
-    #   if: inputs.collect_static
-    #   run:
-    #     zappa manage stg "collectstatic --noinput"
+                   $COMMAND
