@@ -3,16 +3,12 @@ description: 'Compile docker image and push with to ECR'
 
 inputs:
   repository:
+    description: "Name of repository on ecr"
     required: true
-    type: string
   dockerfile:
+    description: "If use a custom dockerfile"
     required: false
-    type: string
     default: 'Dockerfile'
-  build_path:
-    required: false
-    type: string
-    default: '.'
 outputs:
   ecr_url:
     description: "The first output string"
@@ -33,8 +29,7 @@ runs:
         REPOSITORY: ${{ inputs.repository }}
         IMAGE_TAG: ${{ github.sha }}
         DOCKERFILE: ${{ inputs.dockerfile }}
-        BUILD_PATH: ${{ inputs.build_path }}
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f $DOCKERFILE $BUILD_PATH
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f $DOCKERFILE .
         docker push $REGISTRY/$REPOSITORY --all-tags
         echo "ECR_URL=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

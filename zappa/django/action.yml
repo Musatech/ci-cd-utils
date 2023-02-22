@@ -1,0 +1,38 @@
+name: Code Artifact URL
+description: 'Mount Code Artifact URL'
+inputs:
+  ecr_url:
+    description: "ECR URL of image to set in zappa"
+    required: true
+  migrate:
+    description: "Runs migrate"
+    required: false
+    type: boolean 
+    default: false
+  collect_static:
+    description: "Runs collect-static"
+    required: false
+    type: boolean 
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update zappa image
+      shell: bash
+      env:
+        REGISTRY_URL: ${{ inputs.ecr_url }}
+      run:
+        zappa update stg -d $REGISTRY_URL
+
+    - name: Run migrate
+      shell: bash
+      if: inputs.migrate
+      run:
+        zappa manage stg migrate
+
+    - name: Run collect static
+      shell: bash
+      if: inputs.collect_static
+      run:
+        zappa manage stg migrate
