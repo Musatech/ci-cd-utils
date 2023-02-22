@@ -35,4 +35,4 @@ runs:
       shell: bash
       if: inputs.collect_static
       run:
-        zappa manage stg migrate
+        zappa manage stg "collectstatic --noinput"

@@ -9,6 +9,10 @@ inputs:
     description: "If use a custom dockerfile"
     required: false
     default: 'Dockerfile'
+  custom_params:
+    description: "Pass custom parameters to build"
+    required: false
+    default: ''
 outputs:
   ecr_url:
     description: "The first output string"
@@ -29,7 +33,8 @@ runs:
         REPOSITORY: ${{ inputs.repository }}
         IMAGE_TAG: ${{ github.sha }}
         DOCKERFILE: ${{ inputs.dockerfile }}
+        CUSTOM_PARAMS: ${{ inputs.custom_params }}
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -f $DOCKERFILE .
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest $CUSTOM_PARAMS -f $DOCKERFILE .
         docker push $REGISTRY/$REPOSITORY --all-tags
         echo "ECR_URL=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
