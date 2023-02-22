@@ -14,14 +14,14 @@ inputs:
     required: false
     default: ''
   AWS_ACCESS_KEY_ID:
-    description: "Name of repository on ecr"
+    description: "AWS_ACCESS_KEY_ID"
     required: true
   AWS_SECRET_ACCESS_KEY:
-    description: "If use a custom dockerfile"
-    required: false
+    description: "AWS_SECRET_ACCESS_KEY"
+    required: true
     default: 'Dockerfile'
   AWS_REGION:
-    description: "Pass custom parameters to build"
+    description: "AWS_REGION"
     required: false
     default: 'us-east-1'
 
