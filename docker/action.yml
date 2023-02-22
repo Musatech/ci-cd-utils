@@ -1,5 +1,5 @@
-name: Code Artifact URL
-description: 'Mount Code Artifact URL'
+name: Run commands
+description: 'Run commands inside container'
 
 inputs:
   command:
@@ -23,7 +23,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Update zappa image
+    - name: Run command
       shell: bash
       env:
         REGISTRY_URL: ${{ inputs.REGISTRY_URL }}
