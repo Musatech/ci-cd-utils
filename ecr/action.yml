@@ -40,4 +40,8 @@ runs:
     
     - id: build_push
       shell: bash
+      env:
+        REGISTRY: ${{ steps.login_ecr.outputs.registry }}
+        REPOSITORY: ${{ inputs.repository }}
+        IMAGE_TAG: ${{ github.sha }}
       run: echo "ECR_URL=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
