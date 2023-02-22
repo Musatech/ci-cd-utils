@@ -18,6 +18,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install Zappa
+      shell: bash
+      run:
+        pip install `cat requirements.txt | grep zappa`
+
     - name: Update zappa image
       shell: bash
       env:
