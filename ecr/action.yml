@@ -35,8 +35,8 @@ runs:
         tags: |
           ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:latest
           ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # cache-from: type=gha
+        # cache-to: type=gha,mode=max
     
     - id: build_push
       shell: bash
