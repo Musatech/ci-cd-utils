@@ -31,9 +31,10 @@ runs:
         context: .
         build-args: ${{ inputs.build_args }}
         push: true
-        tags: 
-          - ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:latest
-          - ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:${{ github.sha }}
+        file: ${{ inputs.dockerfile }}
+        tags: |
+          ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:latest
+          ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
