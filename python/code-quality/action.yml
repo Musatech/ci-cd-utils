@@ -1,0 +1,53 @@
+name: Run Code Quality Tools
+description: 'Run code quality tools on code'
+
+inputs:
+  app_folder:
+    description: 'Folder to run'
+    required: false
+    default: '.'
+  isort:
+    description: 'Run isort'
+    default: 'true'
+  safety:
+    description: 'Run safety'
+    default: 'true'
+  xenon:
+    description: 'Run xenon'
+    default: 'true'
+  bandit:
+    description: 'Run bandit'
+    default: 'true'
+  prospector:
+    description: 'Run prospector'
+    default: 'true'
+
+
+runs:
+  using: "composite"
+  steps:
+  - name: Run isort
+    shell: bash
+    if: inputs.isort == 'true'
+    run: isort ${{ inputs.app_folder }} --check-only --diff
+
+  - name: Run safety
+    shell: bash
+    if: inputs.safety == 'true'
+    run: safety check ${{ inputs.requirements }}
+
+  - name: Run xenon (Cyclomatic Complexity)
+    shell: bash
+    if: inputs.xenon == 'true'
+    run: xenon --max-absolute B --max-modules A --max-average A ${{ inputs.app_folder }}
+
+  - name: Run bandit
+    shell: bash
+    if: inputs.bandit == 'true'
+    run: bandit -c profile-bandit.yml ${{ inputs.app_folder }} -r -ll
+  
+  - name: Run Prospector
+    shell: bash
+    if: inputs.prospector == 'true'
+    run: |
+      prospector --profile profile_prospector -X
