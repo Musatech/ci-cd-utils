@@ -1,0 +1,27 @@
+name: Code Artifact URL
+description: 'Mount Code Artifact URL'
+inputs:
+  domain:
+    description: "Domain of code artifact"
+    required: true
+  repository:
+    description: "Name of repository on code artifact"
+    required: true
+  AWS_ACCESS_KEY_ID:
+    description: "AWS_ACCESS_KEY_ID"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS_SECRET_ACCESS_KEY"
+    required: true
+    default: 'Dockerfile'
+  AWS_REGION:
+    description: "AWS_REGION"
+    required: false
+    default: 'us-east-1'
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        aws codeartifact login --tool pip --domain ${{ inputs.domain }} --repository ${{ inputs.repository }} --region ${{ inputs.AWS_REGION }}

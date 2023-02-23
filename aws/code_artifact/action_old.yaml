@@ -1,0 +1,36 @@
+name: Code Artifact URL
+description: 'Mount Code Artifact URL'
+inputs:
+  artifact-domain:
+    required: true
+    type: string
+  artifact-repository:
+    required: true
+    type: string
+  artifact-region:
+    type: string
+    default: "us-east-1"
+  requirements-files:
+    type: string
+    default: "requirements.txt"  # for multiple use comma "requirements.txt,requirements2.txt"
+outputs:
+  code-artifact-url:
+    value: ${{ steps.get-code-artifact.outputs.CODEARTIFACT_URL }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: get-code-artifact
+      shell: bash
+      run: |
+        aws codeartifact login --tool pip --domain ${{ inputs.artifact-domain }} --repository ${{ inputs.artifact-repository }} --region ${{ inputs.artifact-region }}
+        CODEARTIFACT_URL=$(cat ~/.config/pip/pip.conf | grep "index-url" | cut -d '=' -f2)
+        echo "CODEARTIFACT_URL=${CODEARTIFACT_URL}" >> $GITHUB_OUTPUT
+    
+    - id: update-requirements
+      shell: bash
+      run: |
+        IFS=',' read -ra ADDR <<< "${{ inputs.requirements-files }}"
+        for i in "${ADDR[@]}"; do
+          echo "$(echo '--extra-index-url ${{ steps.get-code-artifact.outputs.CODEARTIFACT_URL }}' | cat - "$i")" > "$i"
+        done
