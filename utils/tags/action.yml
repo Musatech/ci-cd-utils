@@ -1,0 +1,28 @@
+name: Generate Version Tag
+description: 'Generate a new version tag based on type of branch'
+
+outputs:
+  VERSION_TAG:
+    description: "New version TAG"
+    value: ${{ steps.release_tag.outputs.VERSION_TAG }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: release_tag
+      name: Create tag release number
+      shell: bash
+      run: |
+        HEAD_REF=${{ github.head_ref }}
+        split=(${HEAD_REF//\// })
+        index=$((${#split[@]}-2))
+        PREFIX_TAG=${split[$index]}
+        NEW_TAG=v$(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 1).$(($(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 2) + 1 )).0
+        if [[ ${PREFIX_TAG} == 'upgrade' ]]; then
+            NEW_TAG=v$(($(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 1) + 1 )).0.0
+        fi
+        if [[ ${PREFIX_TAG} == 'hotfix' ]]; then
+            NEW_TAG=v$(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 1).$(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 2).$(($(git tag | sort -V | tail -1 | cut -d "v" -f 2 | cut -d "." -f 3) + 1 ))
+        fi
+        echo "version tag is ${NEW_TAG}"
+        echo "VERSION_TAG=$NEW_TAG" >> $GITHUB_OUTPUT

@@ -15,7 +15,7 @@ inputs:
     default: ''
 outputs:
   ECR_URL:
-    description: "The first output string"
+    description: "URL of image on ECR"
     value: ${{ steps.build_push.outputs.ECR_URL }}
 
 runs:
