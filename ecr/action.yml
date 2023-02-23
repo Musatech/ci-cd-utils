@@ -20,7 +20,7 @@ inputs:
       type=raw,value=${{ github.sha }}
 
 outputs:
-  ECR_URL:
+  IMAGE_TAGS:
     description: "URL of image on ECR"
     value: ${{ steps.metadata.outputs.tags }}
 
