@@ -4,6 +4,9 @@ inputs:
   domain:
     description: "Domain of code artifact"
     required: true
+  domain_owner:
+    description: "Domain owner of code artifact"
+    required: true
   repository:
     description: "Name of repository on code artifact"
     required: true
@@ -26,7 +29,8 @@ runs:
     - id: login_code_artifact
       shell: bash
       run: |
-        aws codeartifact login --tool pip --domain ${{ inputs.domain }} --repository ${{ inputs.repository }} --region ${{ inputs.region }}
+        aws codeartifact login --tool pip --domain ${{ inputs.domain }} --domain-owner ${{ inputs.domain_owner }} \
+                               --repository ${{ inputs.repository }} --region ${{ inputs.region }}
         CODE_ARTIFACT_URL=$(cat ~/.config/pip/pip.conf | grep "index-url" | cut -d '=' -f2)
         echo "CODE_ARTIFACT_URL=${CODE_ARTIFACT_URL}" >> $GITHUB_OUTPUT
     
