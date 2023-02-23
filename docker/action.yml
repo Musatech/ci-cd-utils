@@ -5,20 +5,13 @@ inputs:
   command:
     description: "Run command"
     required: true
+  docker_parameters:
+    description: "Run command"
+    required: false
+    default: ''
   REGISTRY_URL:
     description: "ECR URL of image to set in zappa"
     required: true
-  AWS_ACCESS_KEY_ID:
-    description: "AWS_ACCESS_KEY_ID"
-    required: true
-  AWS_SECRET_ACCESS_KEY:
-    description: "AWS_SECRET_ACCESS_KEY"
-    required: true
-    default: 'Dockerfile'
-  AWS_REGION:
-    description: "AWS_REGION"
-    required: false
-    default: 'us-east-1'
 
 runs:
   using: "composite"
@@ -27,14 +20,7 @@ runs:
       shell: bash
       env:
         REGISTRY_URL: ${{ inputs.REGISTRY_URL }}
-        AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ inputs.AWS_REGION }}
+        PARAMS: ${{ inputs.docker_parameters }}
         COMMAND: ${{ inputs.command }}
       run: |
-        docker run -e AWS_DEFAULT_REGION=$AWS_REGION \
-                   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-                   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-                   -e COMMAND=$COMMAND
-                   --entrypoint '' $REGISTRY_URL \
-                   sh -c 'eval $COMMAND'
+        docker run $PARAMS -e COMMAND=$COMMAND --entrypoint '' $REGISTRY_URL sh -c 'eval $COMMAND'
