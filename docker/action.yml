@@ -37,4 +37,4 @@ runs:
                    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                    -e COMMAND=$COMMAND
                    --entrypoint '' $REGISTRY_URL \
-                   sh -c '$COMMAND'
+                   sh -c 'eval $COMMAND'
