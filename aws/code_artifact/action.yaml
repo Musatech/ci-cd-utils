@@ -11,6 +11,9 @@ inputs:
     description: "Region of code artifact"
     required: false
     default: "us-east-1"
+  requirements_files:
+    description: "Requirements files to update"
+    default: "requirements.txt"  # for multiple use comma "requirements.txt,requirements2.txt"
 
 outputs:
   CODE_ARTIFACT_URL:
@@ -30,7 +33,7 @@ runs:
     - id: update_requirements
       shell: bash
       run: |
-        IFS=',' read -ra ADDR <<< "${{ inputs.requirements-files }}"
+        IFS=',' read -ra ADDR <<< "${{ inputs.requirements_files }}"
         for i in "${ADDR[@]}"; do
           echo "$(echo '--extra-index-url ${{ steps.login_code_artifact.outputs.CODE_ARTIFACT_URL }}' | cat - "$i")" > "$i"
         done
