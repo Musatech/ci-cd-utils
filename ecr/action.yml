@@ -22,7 +22,7 @@ inputs:
 outputs:
   ECR_URL:
     description: "URL of image on ECR"
-    value: ${{ steps.meta.outputs.tags }}
+    value: ${{ steps.metadata.outputs.tags }}
 
 runs:
   using: "composite"
