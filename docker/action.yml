@@ -24,5 +24,6 @@ runs:
         COMMAND: ${{ inputs.command }}
       run: |
         echo "params => $PARAMS"
-        echo "params => $COMMAND"
+        echo "commands => $COMMAND"
+        echo "exec => docker run $PARAMS -e COMMAND=$COMMAND -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c 'echo $COMMAND'"
         docker run $PARAMS -e COMMAND=$COMMAND -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c 'echo $COMMAND'
