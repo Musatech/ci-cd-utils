@@ -25,5 +25,5 @@ runs:
       run: |
         echo "params => $PARAMS"
         echo "commands => $COMMAND"
-        echo "exec => docker run $PARAMS -e COMMAND='$COMMAND' -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c 'echo $COMMAND'"
-        docker run $PARAMS -e COMMAND='$COMMAND' -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c 'eval $COMMAND'
+        echo "exec => docker run $PARAMS -e COMMAND='eval $COMMAND' -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c $COMMAND"
+        docker run $PARAMS -e COMMAND='eval $COMMAND' -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c $COMMAND
