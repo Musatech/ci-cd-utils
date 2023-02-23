@@ -23,4 +23,6 @@ runs:
         PARAMS: ${{ inputs.docker_parameters }}
         COMMAND: ${{ inputs.command }}
       run: |
-        docker run $PARAMS -e COMMAND=$COMMAND --entrypoint '' $REGISTRY_URL sh -c 'eval $COMMAND'
+        echo "params => $PARAMS"
+        echo "params => $COMMAND"
+        docker run $PARAMS -e COMMAND=$COMMAND --entrypoint '' $REGISTRY_URL sh -c 'echo $COMMAND && eval $COMMAND'
