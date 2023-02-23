@@ -7,21 +7,14 @@ inputs:
   repository:
     description: "Name of repository on code artifact"
     required: true
-  AWS_ACCESS_KEY_ID:
-    description: "AWS_ACCESS_KEY_ID"
-    required: true
-  AWS_SECRET_ACCESS_KEY:
-    description: "AWS_SECRET_ACCESS_KEY"
-    required: true
-    default: 'Dockerfile'
-  AWS_REGION:
-    description: "AWS_REGION"
+  region:
+    description: "Region of code artifact"
     required: false
-    default: 'us-east-1'
+    default: "us-east-1"
 
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
-        aws codeartifact login --tool pip --domain ${{ inputs.domain }} --repository ${{ inputs.repository }} --region ${{ inputs.AWS_REGION }}
+        aws codeartifact login --tool pip --domain ${{ inputs.domain }} --repository ${{ inputs.repository }} --region ${{ inputs.region }}
