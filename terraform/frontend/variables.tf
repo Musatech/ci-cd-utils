@@ -56,8 +56,8 @@ locals {
   }
 
   available_ttl = {
-    "dev" = { "min_ttl" = 0, "default_ttl" = 10, "max_ttl" = 30 }
-    "stg" = { "min_ttl" = 0, "default_ttl" = 10, "max_ttl" = 30 }
+    "dev" = { "min_ttl" = 0, "default_ttl" = 10, "max_ttl" = 20 }
+    "stg" = { "min_ttl" = 0, "default_ttl" = 10, "max_ttl" = 20 }
     "hml" = { "min_ttl" = 1800, "default_ttl" = 3600, "max_ttl" = 86400 }
     "prd" = { "min_ttl" = 1800, "default_ttl" = 3600, "max_ttl" = 86400 }
   }
