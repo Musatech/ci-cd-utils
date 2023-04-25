@@ -1,0 +1,23 @@
+name: Push to ECR
+description: 'Compile docker image and push to ECR'
+
+inputs:
+  source:
+    description: "Name of source branch to merge"
+    required: true
+  destination:
+    description: "Name of destination branch to receive a merge"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+  - name: Merge master to 
+    shell: bash
+    run: |
+        git checkout ${{ inputs.destination }}
+        git pull
+        git config --local user.name 'Musa[bot]'
+        git config --local user.email 'tech@musa.co'
+        git merge --no-ff ${{ inputs.source }} -m "Auto-merge ${{ inputs.source }} to ${{ inputs.destination }}"
+        git push
