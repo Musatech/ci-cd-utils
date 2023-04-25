@@ -1,5 +1,5 @@
-name: Run commands
-description: 'Run commands inside container'
+name: Run in Container
+description: 'Run commands inside a container'
 
 inputs:
   command:
