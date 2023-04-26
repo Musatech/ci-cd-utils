@@ -18,6 +18,7 @@ inputs:
     required: false
     default: |
       type=raw,value=${{ github.sha }}
+      type=raw,value=latest
 
 outputs:
   IMAGE_TAGS:
