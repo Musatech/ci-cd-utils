@@ -1,5 +1,5 @@
-name: Push to ECR
-description: 'Compile docker image and push to ECR'
+name: Compile docker image
+description: 'Compile docker image and export in artifact'
 
 inputs:
   dockerfile:
