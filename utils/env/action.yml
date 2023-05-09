@@ -6,9 +6,12 @@ inputs:
     description: "Name of branch name"
     required: false
     default: ''
-  variables:
-    description: "Variables to set if is current branch"
-    required: false
+  AWS_ACCESS_KEY_ID:
+    description: "AWS_ACCESS_KEY_ID"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS_SECRET_ACCESS_KEY"
+    required: true
 
 runs:
   using: "composite"
@@ -18,9 +21,5 @@ runs:
       name: Set environment if is correct branch
       shell: bash
       run: |
-        VARIABLES=${{ inputs.variables }}
-        TEMP=(${VARIABLES//;/\\n})
-        for element in "${TEMP[@]}"
-        do
-            echo "$element" >> "$GITHUB_ENV"
-        done
+        echo "AWS_ACCESS_KEY_ID=${{ inputs.AWS_ACCESS_KEY_ID }}" >> "$GITHUB_ENV"
+        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.AWS_SECRET_ACCESS_KEY }}" >> "$GITHUB_ENV"
