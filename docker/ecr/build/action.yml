@@ -1,0 +1,37 @@
+name: Push to ECR
+description: 'Compile docker image and push to ECR'
+
+inputs:
+  dockerfile:
+    description: "If use a custom dockerfile"
+    required: false
+    default: 'Dockerfile'
+  build_args:
+    description: "Pass custom parameters to build"
+    required: false
+    default: ''
+  tags:
+    description: "Pass custom tag name"
+    required: false
+    default: 'musa/test:test'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        build-args: ${{ inputs.build_args }}
+        load: true
+        file: ${{ inputs.dockerfile }}
+        tags: ${{ inputs.tags }}
+        labels: ${{ steps.metadata.outputs.labels }}
+        outputs: type=docker,dest=/tmp/myimage.tar
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test image
+        path: /tmp/docker_image.tar 
