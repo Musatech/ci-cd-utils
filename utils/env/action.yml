@@ -18,6 +18,8 @@ runs:
       name: Set environment if is correct branch
       shell: bash
       run: |
-        VARIABLES=${{ inputs.variables }}
-        TEMP=(${VARIABLES//;/\\n})
-        echo "$TEMP" >> "$GITHUB_ENV"
+        IFS=';' read -r -a array <<< ${{ inputs.variables }}
+        for element in "${array[@]}"
+        do
+            "$element" >> "$GITHUB_ENV"
+        done
