@@ -28,7 +28,7 @@ runs:
         file: ${{ inputs.dockerfile }}
         tags: ${{ inputs.tags }}
         labels: ${{ steps.metadata.outputs.labels }}
-        outputs: type=docker,dest=/tmp/myimage.tar
+        outputs: type=docker,dest=/tmp/docker_image.tar
     
     - name: Upload artifact
       uses: actions/upload-artifact@v3
