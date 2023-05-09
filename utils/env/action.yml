@@ -1,0 +1,23 @@
+name: Set env
+description: 'Set env only if is correct branch'
+
+inputs:
+  branch:
+    description: "Name of branch name"
+    required: false
+    default: ''
+  variables:
+    description: "Variables to set if is current branch"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - id: set_env
+      if: github.ref == ${{ inputs.branch }}
+      name: Set environment if is correct branch
+      shell: bash
+      run: |
+        VARIABLES=${{ inputs.variables }}
+        TEMP=(${VARIABLES//;/\\n})
+        echo "$TEMP" >> "$GITHUB_ENV"
