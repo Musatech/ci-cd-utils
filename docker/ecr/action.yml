@@ -21,9 +21,12 @@ inputs:
       type=raw,value=latest
 
 outputs:
-  IMAGE_TAGS:
+  tags:
     description: "URL of image on ECR"
     value: ${{ steps.metadata.outputs.tags }}
+  registry:
+    description: "ECR image path"
+    value: ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}
 
 runs:
   using: "composite"
