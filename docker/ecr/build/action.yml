@@ -40,5 +40,6 @@ runs:
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Test image
-        path: /tmp/docker_image.tar 
+        name: Docker base image
+        path: /tmp/docker_image.tar
+        retention-days: 1
