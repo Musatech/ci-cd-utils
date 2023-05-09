@@ -1,32 +1,5 @@
-name: Push to ECR
-description: 'Compile docker image and push to ECR'
-
-inputs:
-  repository:
-    description: "Name of repository on ecr"
-    required: true
-  dockerfile:
-    description: "If use a custom dockerfile"
-    required: false
-    default: 'Dockerfile'
-  build_args:
-    description: "Pass custom parameters to build"
-    required: false
-    default: ''
-  image_tags:
-    description: "Custom image tags to build"
-    required: false
-    default: |
-      type=raw,value=${{ github.sha }}
-      type=raw,value=latest
-
-outputs:
-  tags:
-    description: "URL of image on ECR"
-    value: ${{ steps.metadata.outputs.tags }}
-  registry:
-    description: "ECR image path"
-    value: ${{ steps.expose.outputs.repository }}
+name: Download and Load Image
+description: 'Download and load docker image'
 
 runs:
   using: "composite"
