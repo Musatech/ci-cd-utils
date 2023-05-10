@@ -1,19 +1,26 @@
-name: Download and Load Image
-description: 'Download and load docker image'
+name: Run commands
+description: 'Run commands inside container'
+
+inputs:
+  command:
+    description: "Run command"
+    required: true
+  docker_parameters:
+    description: "Run command"
+    required: false
+    default: ''
+  REGISTRY_URL:
+    description: "ECR URL of image to set in zappa"
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      
-    - name: Download artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: Docker base image
-        path: /tmp
-    
-    - name: Load image
+    - name: Run command
       shell: bash
+      env:
+        REGISTRY_URL: ${{ inputs.REGISTRY_URL }}
+        PARAMS: ${{ inputs.docker_parameters }}
+        COMMAND: ${{ inputs.command }}
       run: |
-        docker load --input /tmp/docker_image.tar
+        docker run $PARAMS -e COMMAND='${{ inputs.command }}' -e REGISTRY_URL=$REGISTRY_URL --entrypoint '' $REGISTRY_URL sh -c 'eval $COMMAND'
