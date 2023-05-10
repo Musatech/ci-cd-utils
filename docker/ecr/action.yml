@@ -47,6 +47,9 @@ runs:
         images: ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}
         tags: ${{ inputs.image_tags }}
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
