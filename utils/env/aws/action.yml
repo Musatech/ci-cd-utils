@@ -17,7 +17,9 @@ runs:
   using: "composite"
   steps:
     - id: set_env
-      if: github.ref == ${{ inputs.branch }}
+      if: |
+        github.ref_name == inputs.branch || 
+        (github.event_name == 'pull_request' && github.head_ref == inputs.branch)
       name: Set environment if is correct branch
       shell: bash
       run: |
