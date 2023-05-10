@@ -56,6 +56,8 @@ runs:
         file: ${{ inputs.dockerfile }}
         tags: ${{ steps.metadata.outputs.tags }}
         labels: ${{ steps.metadata.outputs.labels }}
+        cache-from: type=registry,ref=${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:buildcache
+        cache-to: type=registry,ref=${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:buildcache,mode=max
     
     - name: Expose outputs
       id: expose
