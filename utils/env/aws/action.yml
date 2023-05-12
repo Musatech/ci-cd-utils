@@ -12,6 +12,9 @@ inputs:
   AWS_SECRET_ACCESS_KEY:
     description: "AWS_SECRET_ACCESS_KEY"
     required: true
+  CLUSTER:
+    description: "CLUSTER"
+    required: false
 
 runs:
   using: "composite"
@@ -23,3 +26,4 @@ runs:
       run: |
         echo "AWS_ACCESS_KEY_ID=${{ inputs.AWS_ACCESS_KEY_ID }}" >> "$GITHUB_ENV"
         echo "AWS_SECRET_ACCESS_KEY=${{ inputs.AWS_SECRET_ACCESS_KEY }}" >> "$GITHUB_ENV"
+        echo "CLUSTER=${{ inputs.CLUSTER }}" >> "$GITHUB_ENV"
