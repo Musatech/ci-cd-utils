@@ -6,39 +6,39 @@ on:
       BRANCH:
         description: "BRANCH"
         value: ${{ jobs.set-env.outputs.BRANCH }}
-      CLUSTER:
-        description: "CLUSTER"
-        value: ${{ jobs.set-env.outputs.CLUSTER }}
+      ENV:
+        description: "ENV"
+        value: ${{ jobs.set-env.outputs.ENV }}
 
 jobs:
   set-env:
     name: Generate output
     runs-on: ubuntu-latest
     outputs:
-      CLUSTER: ${{ steps.expose.outputs.CLUSTER }}
+      ENV: ${{ steps.expose.outputs.ENV }}
       BRANCH: ${{ steps.expose.outputs.BRANCH }}
     steps:
       - name: DEV Environment 
         if: github.ref_name == 'development' || github.ref_name == 'develop'
         shell: bash
         run: |
-          echo "CLUSTER=dev" >> "$GITHUB_ENV"
+          echo "ENV=dev" >> "$GITHUB_ENV"
       
       - name: STG Environment
         if: github.ref_name == 'stage'
         shell: bash
         run: |
-          echo "CLUSTER=stg" >> "$GITHUB_ENV"
+          echo "ENV=stg" >> "$GITHUB_ENV"
       
       - name: PRD Environment
         if: github.ref_name == 'master' || github.ref_name == 'main'
         shell: bash
         run: |
-          echo "CLUSTER=prd" >> "$GITHUB_ENV"
+          echo "ENV=prd" >> "$GITHUB_ENV"
       
       - name: expose ENV for branch ${{ github.ref_name }}
         id: expose
         shell: bash
         run: |
-            echo "CLUSTER=${{ env.CLUSTER }}" >> $GITHUB_OUTPUT
+            echo "ENV=${{ env.ENV }}" >> $GITHUB_OUTPUT
             echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
