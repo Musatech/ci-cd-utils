@@ -19,22 +19,23 @@ on:
     outputs:
       AWS_ACCESS_KEY_ID:
         description: "AWS_ACCESS_KEY_ID"
-        value: ${{ steps.expose.outputs.AWS_ACCESS_KEY_ID }}
+        value: ${{ jobs.set-env.outputs.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY:
         description: "AWS_SECRET_ACCESS_KEY"
-        value: ${{ steps.expose.outputs.AWS_SECRET_ACCESS_KEY }}
+        value: ${{ jobs.set-env.outputs.AWS_SECRET_ACCESS_KEY }}
       CLUSTER:
         description: "CLUSTER"
-        value: ${{ steps.expose.outputs.CLUSTER }}
+        value: ${{ jobs.set-env.outputs.CLUSTER }}
 
 jobs:
-  example_job:
+  set-env:
     name: Generate output
     runs-on: ubuntu-latest
     outputs:
       AWS_ACCESS_KEY_ID: ${{ steps.expose.outputs.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY_PRD: ${{ steps.expose.outputs.AWS_SECRET_ACCESS_KEY_PRD }}
       CLUSTER: ${{ steps.expose.outputs.CLUSTER }}
+      BRANCH: ${{ github.ref_name }}
     steps:
       - name: DEV Environment 
         if: github.ref_name == 'development' || github.ref_name == 'develop'
