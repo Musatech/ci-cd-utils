@@ -4,10 +4,10 @@ description: 'Set ENV for a branch'
 outputs:
   BRANCH:
     description: "BRANCH"
-    value: ${{ jobs.set-env.outputs.BRANCH }}
+    value: ${{ steps.expose.outputs.BRANCH }}
   ENV:
     description: "ENV"
-    value: ${{ jobs.set-env.outputs.ENV }}
+    value: ${{ steps.expose.outputs.ENV }}
 
 runs:
   using: "composite"
