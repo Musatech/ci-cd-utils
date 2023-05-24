@@ -24,6 +24,9 @@ outputs:
   tags:
     description: "URL of image on ECR"
     value: ${{ steps.metadata.outputs.tags }}
+  registry:
+    description: "ECR image path"
+    value: ${{ steps.expose.outputs.repository }}
 
 runs:
   using: "composite"
@@ -58,3 +61,11 @@ runs:
         labels: ${{ steps.metadata.outputs.labels }}
         cache-from: type=registry,ref=${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}:latest
         cache-to: type=inline
+    
+    - name: Expose outputs
+      id: expose
+      shell: bash
+      env:
+        REPOSITORY: ${{ steps.login_ecr.outputs.registry }}/${{ inputs.repository }}
+      run: |
+          echo "repository=$REPOSITORY" >> $GITHUB_OUTPUT 

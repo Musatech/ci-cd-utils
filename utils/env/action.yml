@@ -1,0 +1,38 @@
+name: Set ENV
+description: 'Set ENV for a branch'
+
+outputs:
+  BRANCH:
+    description: "BRANCH"
+    value: ${{ jobs.set-env.outputs.BRANCH }}
+  ENV:
+    description: "ENV"
+    value: ${{ jobs.set-env.outputs.ENV }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: DEV Environment 
+      if: github.ref_name == 'development' || github.ref_name == 'develop'
+      shell: bash
+      run: |
+        echo "ENV=dev" >> "$GITHUB_ENV"
+    
+    - name: STG Environment
+      if: github.ref_name == 'stage'
+      shell: bash
+      run: |
+        echo "ENV=stg" >> "$GITHUB_ENV"
+    
+    - name: PRD Environment
+      if: github.ref_name == 'master' || github.ref_name == 'main'
+      shell: bash
+      run: |
+        echo "ENV=prd" >> "$GITHUB_ENV"
+    
+    - name: expose ENV for branch ${{ github.ref_name }}
+      id: expose
+      shell: bash
+      run: |
+          echo "ENV=${{ env.ENV }}" >> $GITHUB_OUTPUT
+          echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
