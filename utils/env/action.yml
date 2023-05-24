@@ -34,5 +34,8 @@ runs:
       id: expose
       shell: bash
       run: |
-          echo "ENV=${{ env.ENV }}" >> $GITHUB_OUTPUT
-          echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "AWS_ACCESS_KEY_ID=${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', steps.set_env.outputs.ENV)] }}" >> "$GITHUB_ENV"
+        echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', steps.set_env.outputs.ENV)] }}" >> "$GITHUB_ENV"
+        echo "ENV=${{ steps.set_env.outputs.ENV }}" >> "$GITHUB_ENV"
+        echo "ENV=${{ env.ENV }}" >> $GITHUB_OUTPUT
+        echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
