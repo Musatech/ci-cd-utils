@@ -35,7 +35,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ steps.expose.outputs.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY_PRD: ${{ steps.expose.outputs.AWS_SECRET_ACCESS_KEY_PRD }}
       CLUSTER: ${{ steps.expose.outputs.CLUSTER }}
-      BRANCH: ${{ steps.expose.outputs.BRANCH }}
+      BRANCH: ${{ github.ref_name }}
     steps:
       - name: DEV Environment 
         if: github.ref_name == 'development' || github.ref_name == 'develop'
@@ -61,10 +61,10 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_PRD }}" >> "$GITHUB_ENV"
           echo "CLUSTER=prd" >> "$GITHUB_ENV"
       
-      - id: expose ENV for branch {{ github.ref_name }}
+      - name: expose ENV for branch ${{ github.ref_name }}
+        id: expose
         shell: bash
         run: |
             echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_OUTPUT
             echo "AWS_SECRET_ACCESS_KEY_PRD=${{ env.AWS_SECRET_ACCESS_KEY_PRD }}" >> $GITHUB_OUTPUT
             echo "CLUSTER=${{ env.CLUSTER }}" >> $GITHUB_OUTPUT
-            echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
