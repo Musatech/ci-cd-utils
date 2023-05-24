@@ -2,27 +2,10 @@ name: Set Environment
 
 on:
   workflow_call:
-    secrets:
-      AWS_ACCESS_KEY_ID_DEV:
-        required: true
-      AWS_SECRET_ACCESS_KEY_DEV:
-        required: true
-      AWS_ACCESS_KEY_ID_STG:
-        required: true
-      AWS_SECRET_ACCESS_KEY_STG:
-        required: true
-      AWS_ACCESS_KEY_ID_PRD:
-        required: true
-      AWS_SECRET_ACCESS_KEY_PRD:
-        required: true
-
     outputs:
-      AWS_ACCESS_KEY_ID:
-        description: "AWS_ACCESS_KEY_ID"
-        value: ${{ jobs.set-env.outputs.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY:
-        description: "AWS_SECRET_ACCESS_KEY"
-        value: ${{ jobs.set-env.outputs.AWS_SECRET_ACCESS_KEY }}
+      BRANCH:
+        description: "BRANCH"
+        value: ${{ jobs.set-env.outputs.BRANCH }}
       CLUSTER:
         description: "CLUSTER"
         value: ${{ jobs.set-env.outputs.CLUSTER }}
@@ -32,8 +15,6 @@ jobs:
     name: Generate output
     runs-on: ubuntu-latest
     outputs:
-      AWS_ACCESS_KEY_ID: ${{ steps.expose.outputs.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY_PRD: ${{ steps.expose.outputs.AWS_SECRET_ACCESS_KEY_PRD }}
       CLUSTER: ${{ steps.expose.outputs.CLUSTER }}
       BRANCH: ${{ steps.expose.outputs.BRANCH }}
     steps:
@@ -41,31 +22,23 @@ jobs:
         if: github.ref_name == 'development' || github.ref_name == 'develop'
         shell: bash
         run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> "$GITHUB_ENV"
           echo "CLUSTER=dev" >> "$GITHUB_ENV"
       
       - name: STG Environment
         if: github.ref_name == 'stage'
         shell: bash
         run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STG }}" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> "$GITHUB_ENV"
           echo "CLUSTER=stg" >> "$GITHUB_ENV"
       
       - name: PRD Environment
         if: github.ref_name == 'master' || github.ref_name == 'main'
         shell: bash
         run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PRD }}" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_PRD }}" >> "$GITHUB_ENV"
           echo "CLUSTER=prd" >> "$GITHUB_ENV"
       
       - name: expose ENV for branch ${{ github.ref_name }}
         id: expose
         shell: bash
         run: |
-            echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_OUTPUT
-            echo "AWS_SECRET_ACCESS_KEY_PRD=${{ env.AWS_SECRET_ACCESS_KEY_PRD }}" >> $GITHUB_OUTPUT
             echo "CLUSTER=${{ env.CLUSTER }}" >> $GITHUB_OUTPUT
             echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
