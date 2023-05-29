@@ -30,13 +30,6 @@ runs:
       run: |
         echo "ENV=prd" >> "$GITHUB_ENV"
     
-    - name: Get AWS env for ${{ steps.set_env.outputs.ENV }}
-      shell: bash
-      run: |
-        echo "AWS_ACCESS_KEY_ID=${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', steps.set_env.outputs.ENV)] }}" >> "$GITHUB_ENV"
-        echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', steps.set_env.outputs.ENV)] }}" >> "$GITHUB_ENV"
-        echo "ENV=${{ steps.set_env.outputs.ENV }}" >> "$GITHUB_ENV"
-
     - name: expose ENV for branch ${{ github.ref_name }}
       id: expose
       shell: bash
