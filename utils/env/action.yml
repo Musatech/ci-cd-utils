@@ -12,27 +12,39 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: DEV Environment 
+    - id: dev_env
+      name: DEV Environment
       if: github.ref_name == 'development' || github.ref_name == 'develop'
       shell: bash
       run: |
         echo "ENV=dev" >> "$GITHUB_ENV"
+        echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
     
-    - name: STG Environment
+    - id: stg_env
+      name: STG Environment
       if: github.ref_name == 'stage'
       shell: bash
       run: |
         echo "ENV=stg" >> "$GITHUB_ENV"
     
-    - name: PRD Environment
+    - id: prd_env
+      name: PRD Environment
       if: github.ref_name == 'master' || github.ref_name == 'main'
       shell: bash
       run: |
         echo "ENV=prd" >> "$GITHUB_ENV"
     
-    - name: expose ENV for branch ${{ github.ref_name }}
-      id: expose
+    - id: expose
+      name: expose ENV for branch ${{ github.ref_name }}
+      if: steps.dev_env.outcome == 'success' || steps.stg_env.outcome == 'success' || steps.prd_env.outcome == 'success'
       shell: bash
       run: |
         echo "ENV=${{ env.ENV }}" >> $GITHUB_OUTPUT
         echo "BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+    
+    - name: Failed to set env
+      if: steps.dev_env.outcome == 'failure' || steps.stg_env.outcome == 'failure' || steps.prd_env.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "### No env found, check the branch name" > $GITHUB_STEP_SUMMARY
+        exit 1
