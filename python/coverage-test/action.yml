@@ -29,9 +29,7 @@ runs:
       coverage report -i --fail-under ${{ inputs.min_coverage }}
       ${{ inputs.output_command }}
   
-  - name: Publish Test Report
-    shell: bash
-    uses: mikepenz/action-junit-report@v3
+  - uses: mikepenz/action-junit-report@v3
     if: inputs.xml_path != ''
     with:
       report_paths: ${{ inputs.xml_path }}
