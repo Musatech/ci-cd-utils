@@ -21,6 +21,10 @@ inputs:
   prospector:
     description: 'Run prospector'
     default: 'true'
+  requirements_inputs:
+    description: 'Requirements files'
+    required: false
+    default: '--file requirements.txt'
 
 
 runs:
@@ -34,7 +38,7 @@ runs:
   - name: Run safety
     shell: bash
     if: inputs.safety == 'true'
-    run: safety check ${{ inputs.requirements }}
+    run: safety check ${{ inputs.requirements_inputs }}
 
   - name: Run xenon (Cyclomatic Complexity)
     shell: bash
