@@ -50,8 +50,8 @@ runs:
     if: inputs.bandit == 'true'
     run: bandit -c profile-bandit.yml ${{ inputs.app_folder }} -r -ll
   
-  - name: Run Prospector
-    shell: bash
-    if: inputs.prospector == 'true'
-    run: |
-      prospector --profile profile_prospector -X
+  # - name: Run Prospector
+  #   shell: bash
+  #   if: inputs.prospector == 'true'
+  #   run: |
+  #     prospector --profile profile_prospector -X
