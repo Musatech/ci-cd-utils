@@ -11,6 +11,10 @@ variable "project-name" {
   type = string
 }
 
+variable "team" {
+  type = string
+}
+
 variable "app-domain" {
   type = string
 }
@@ -51,7 +55,7 @@ locals {
   environment_map = {
     "dev" = "development"
     "stg" = "staging"
-    "hml" = "homoloh"
+    "hml" = "homolog"
     "prd" = "production"
   }
 
@@ -74,7 +78,9 @@ locals {
   }
 
   common_tags = {
-    "System"      = local.project_name
-    "Environment" = local.environment_short
+    Environment = var.environment
+    Team        = var.team
+    Service     = var.project-name
+    Name        = "${var.project-name}.service.${var.environment}.musa.co"
   }
 }
