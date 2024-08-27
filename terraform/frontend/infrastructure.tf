@@ -3,36 +3,61 @@
 ####
 resource "aws_s3_bucket" "website" {
   bucket = local.bucket_name
-  acl    = "public-read"
 
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
-  }
-
-  cors_rule {
-    allowed_methods = local.s3_allowed_methods
-    allowed_origins = ["*"]
-  }
-
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "PublicReadGetObject",
-        "Effect" : "Allow",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : "arn:aws:s3:::${local.bucket_name}/*"
-      }
-    ]
-  })
   # versioning {
   #   enabled = local.environment_short == "prd" ? true : false
   # }
 
   tags = local.common_tags
 
+}
+
+resource "aws_s3_bucket_public_access_block" "public_access" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_cors_configuration" "cors" {
+  bucket = aws_s3_bucket.website.id
+
+  cors_rule {
+    allowed_methods = local.s3_allowed_methods
+    allowed_origins = ["*"]
+  }
+}
+
+resource "aws_s3_bucket_website_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  index_document {
+    suffix = "index.html"
+  }
+  error_document {
+    key = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_policy" "public_acl" {
+  bucket = aws_s3_bucket.website.id
+
+  policy = <<POLICY
+{
+  "Version" : "2012-10-17",
+  "Statement" : [
+    {
+      "Sid" : "PublicReadGetObject",
+      "Effect" : "Allow",
+      "Principal" : "*",
+      "Action" : "s3:*",
+      "Resource" : "arn:aws:s3:::${local.bucket_name}/*"
+    }
+  ]
+}
+POLICY
 }
 
 #####
