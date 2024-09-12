@@ -50,7 +50,7 @@ runs:
 
     - name: Deploy files to S3 bucket
       shell: bash
-      run: aws s3 sync ./next/ s3://${{ inputs.bucket_name }}/ --delete
+      run: aws s3 sync .next/ s3://${{ inputs.bucket_name }}/ --delete
 
   # - name: Invalidate current CloudFront  # think about how to get this dynamic
   #   shell: bash
