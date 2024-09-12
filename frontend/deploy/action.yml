@@ -8,9 +8,6 @@ inputs:
   bucket_name:
     description: 'S3 Bucket name'
     required: true
-  cloudfront_id:
-    description: 'Cloudfront id'
-    required: true
   auth_token:
     description: 'Auth token for private npm packages'
     default: ''
@@ -56,6 +53,6 @@ runs:
     shell: bash
     run: aws s3 sync ./dist/ s3://${{ inputs.bucket_name }}/ --delete
 
-  - name: Invalidate current CloudFront
-    shell: bash
-    run: aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_id }} --paths "/*"
+  # - name: Invalidate current CloudFront  # think about how to get this dynamic
+  #   shell: bash
+  #   run: aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_id }} --paths "/*"
