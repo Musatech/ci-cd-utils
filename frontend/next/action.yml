@@ -21,7 +21,6 @@ inputs:
     description: 'AWS SECRET_ACCESS_KEY'
     required: true
 
-
 runs:
   using: "composite"
   steps:
