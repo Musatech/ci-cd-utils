@@ -5,9 +5,6 @@ inputs:
   build_command:
     description: 'Command to build project ex: (yarn build)'
     required: true
-  export_command:
-    description: 'Command to export project ex: (yarn export)'
-    required: true
   bucket_name:
     description: 'S3 Bucket name'
     required: true
@@ -43,10 +40,6 @@ runs:
     - name: Build project
       shell: bash
       run: ${{ inputs.build_command }}
-
-    - name: Export project
-      shell: bash
-      run: ${{ inputs.export_command }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
