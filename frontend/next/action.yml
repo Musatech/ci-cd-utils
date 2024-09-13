@@ -46,7 +46,7 @@ runs:
 
     - name: Export project
       shell: bash
-      run: yarn export
+      run: ${{ inputs.export_command }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
