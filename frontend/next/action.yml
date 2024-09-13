@@ -54,7 +54,7 @@ runs:
 
     - name: Deploy files to S3 bucket (out)
       shell: bash
-      run: aws s3 sync out/ s3://${{ inputs.bucket_name }}/ --delete
+      run: aws s3 sync out/ s3://${{ inputs.bucket_name }}/out/ --delete
 
     - name: Deploy files to S3 bucket
       shell: bash
