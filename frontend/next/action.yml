@@ -41,10 +41,6 @@ runs:
       shell: bash
       run: ${{ inputs.build_command }}
 
-    - name: Show project structure after build
-      shell: bash
-      run: tree .
-
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
@@ -54,11 +50,11 @@ runs:
 
     - name: Deploy files to S3 bucket (out)
       shell: bash
-      run: aws s3 sync out/ s3://${{ inputs.bucket_name }}/out/ --delete
+      run: aws s3 sync out/ s3://${{ inputs.bucket_name }}/ --delete
 
-    - name: Deploy files to S3 bucket
-      shell: bash
-      run: aws s3 sync .next/ s3://${{ inputs.bucket_name }}/ --delete
+#    - name: Deploy files to S3 bucket
+#      shell: bash
+#      run: aws s3 sync .next/ s3://${{ inputs.bucket_name }}/ --delete
 
   # - name: Invalidate current CloudFront  # think about how to get this dynamic
   #   shell: bash
