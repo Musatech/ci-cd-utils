@@ -8,6 +8,9 @@ inputs:
   build_command:
     description: 'Command to build project ex: (yarn build)'
     required: true
+  dist_folder:
+    description: 'Folder to deploy'
+    default: 'dist'
   bucket_name:
     description: 'S3 Bucket name'
     required: true
@@ -54,7 +57,7 @@ runs:
 
   - name: Deploy files to S3 bucket
     shell: bash
-    run: aws s3 sync ./dist/ s3://${{ inputs.bucket_name }}/ --delete
+    run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
 
   # - name: Invalidate current CloudFront  # think about how to get this dynamic
   #   shell: bash
