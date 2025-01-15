@@ -2,6 +2,9 @@ name: Run Code Quality Tools
 description: 'Run code quality tools on code'
 
 inputs:
+  node_version:
+    description: 'Node.js version'
+    default: 18.x
   build_command:
     description: 'Command to build project ex: (yarn build)'
     required: true
@@ -25,10 +28,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Use Node.js 18.x
+  - name: Use Node.js ${{ inputs.node_version }}
     uses: actions/setup-node@v3
     with:
-      node-version: 18.x
+      node-version: ${{ inputs.node_version }}
       registry-url: https://npm.pkg.github.com
       # cache: 'npm'
 
