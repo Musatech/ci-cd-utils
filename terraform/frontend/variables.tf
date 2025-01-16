@@ -20,7 +20,8 @@ variable "app-domain" {
 }
 
 variable "dns-domain" {
-  type = string
+  type     = string
+  nullable = true
 }
 
 variable "acm-certificate-domain" {

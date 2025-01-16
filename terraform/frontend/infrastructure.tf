@@ -9,7 +9,6 @@ resource "aws_s3_bucket" "website" {
   # }
 
   tags = local.common_tags
-
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {
@@ -19,6 +18,8 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
+
+  depends_on = [aws_s3_bucket.website]
 }
 
 resource "aws_s3_bucket_cors_configuration" "cors" {
@@ -139,12 +140,14 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 ##   Add domain in route 53 cloudfront
 ####
 data "aws_route53_zone" "main_zone" {
+  count        = local.domain_dns != null ? 1 : 0
   name         = local.domain_dns
   private_zone = false
 }
 
 resource "aws_route53_record" "endpoint" {
-  zone_id = data.aws_route53_zone.main_zone.zone_id
+  count   = local.domain_dns != null ? 1 : 0
+  zone_id = data.aws_route53_zone.main_zone[0].zone_id
   name    = local.domain
   type    = "A"
 
