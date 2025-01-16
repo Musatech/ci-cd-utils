@@ -67,8 +67,9 @@ POLICY
 
 data "aws_acm_certificate" "cert" {
   # get existing ACM certificate
-  domain   = local.acm_domain
-  statuses = ["ISSUED"]
+  domain      = local.acm_domain
+  statuses    = ["ISSUED"]
+  most_recent = true
 }
 
 #####
@@ -81,7 +82,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
-  aliases = [local.domain]
+  aliases = concat([local.domain], local.extra_domains)
 
   origin {
     domain_name = aws_s3_bucket.website.bucket_regional_domain_name

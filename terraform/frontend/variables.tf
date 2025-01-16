@@ -19,6 +19,10 @@ variable "app-domain" {
   type = string
 }
 
+variable "extra-domains" {
+  type    = list(string)
+  default = []
+}
 variable "dns-domain" {
   type     = string
   nullable = true
@@ -44,6 +48,7 @@ locals {
   environment        = lookup(local.environment_map, local.environment_short)
   acm_domain         = var.acm-certificate-domain
   domain             = var.app-domain
+  extra_domains      = var.app-domain
   domain_dns         = var.dns-domain
   ttl_times          = lookup(local.available_ttl, local.environment_short)
   allowed_methods    = lookup(local.available_request_methods, local.request_policy)
