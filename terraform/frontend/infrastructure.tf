@@ -120,7 +120,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 
   viewer_certificate {
     # cloudfront_default_certificate = true
-    acm_certificate_arn = var.acm-certificate-arn ? var.acm-certificate-arn != null : data.aws_acm_certificate.cert.arn
+    acm_certificate_arn = var.acm-certificate-arn != null ? var.acm-certificate-arn : data.aws_acm_certificate.cert.arn
     ssl_support_method  = "sni-only"
   }
 
