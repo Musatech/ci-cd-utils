@@ -69,7 +69,6 @@ POLICY
 
 data "aws_acm_certificate" "cert" {
   # get existing ACM certificate
-  arn         = var.acm-certificate-arn
   domain      = var.acm-certificate-domain
   statuses    = ["ISSUED"]
   most_recent = true
@@ -121,7 +120,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 
   viewer_certificate {
     # cloudfront_default_certificate = true
-    acm_certificate_arn = data.aws_acm_certificate.cert.arn
+    acm_certificate_arn = var.acm-certificate-arn ? var.acm-certificate-arn : data.aws_acm_certificate.cert.arn
     ssl_support_method  = "sni-only"
   }
 
