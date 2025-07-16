@@ -59,6 +59,8 @@ resource "aws_s3_bucket_policy" "public_acl" {
   ]
 }
 POLICY
+
+  depends_on = [aws_s3_bucket.website, aws_s3_bucket_public_access_block.public_access]
 }
 
 #####
@@ -67,7 +69,8 @@ POLICY
 
 data "aws_acm_certificate" "cert" {
   # get existing ACM certificate
-  domain      = local.acm_domain
+  arn         = var.acm-certificate-arn
+  domain      = var.acm-certificate-domain
   statuses    = ["ISSUED"]
   most_recent = true
 }

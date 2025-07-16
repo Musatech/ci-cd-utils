@@ -28,6 +28,15 @@ variable "dns-domain" {
   nullable = true
 }
 
+variable "acm-certificate-arn" {
+  type    = string
+  default = null
+  validation {
+    condition     = var.acm-certificate-arn == null || can(regex("^arn:aws:acm:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:certificate/[a-z0-9-]+$", var.acm-certificate-arn))
+    error_message = "Invalid ACM certificate ARN format."
+  }
+}
+
 variable "acm-certificate-domain" {
   type = string
 }
@@ -46,7 +55,6 @@ locals {
   ####
   environment_short  = var.environment
   environment        = lookup(local.environment_map, local.environment_short)
-  acm_domain         = var.acm-certificate-domain
   domain             = var.app-domain
   extra_domains      = var.extra-domains
   domain_dns         = var.dns-domain
