@@ -28,7 +28,7 @@ inputs:
     required: true
   enable_cloudfront_invalidation:
     description: "Enable CloudFront cache invalidation (will auto-discover distribution)"
-    default: "true"
+    default: true
 
 runs:
   using: "composite"
@@ -62,7 +62,7 @@ runs:
       run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
 
     - name: Auto-discover and invalidate CloudFront cache
-      if: ${{ inputs.enable_cloudfront_invalidation == 'true' }}
+      if: ${{ inputs.enable_cloudfront_invalidation == true || inputs.enable_cloudfront_invalidation == 'true' }}
       shell: bash
       run: |
         echo "🔍 Searching for CloudFront distribution using bucket: ${{ inputs.bucket_name }}"
