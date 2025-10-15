@@ -26,9 +26,9 @@ inputs:
   aws_secret_access_key:
     description: "AWS SECRET_ACCESS_KEY"
     required: true
-  cloudfront_distribution_id:
-    description: "CloudFront Distribution ID for cache invalidation"
-    default: ""
+  enable_cloudfront_invalidation:
+    description: "Enable CloudFront cache invalidation (will auto-discover distribution)"
+    default: "true"
 
 runs:
   using: "composite"
@@ -61,9 +61,20 @@ runs:
       shell: bash
       run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
 
-    - name: Invalidate CloudFront cache
-      if: ${{ inputs.cloudfront_distribution_id != '' }}
+    - name: Auto-discover and invalidate CloudFront cache
+      if: ${{ inputs.enable_cloudfront_invalidation == 'true' }}
       shell: bash
       run: |
-        echo "Invalidating CloudFront distribution: ${{ inputs.cloudfront_distribution_id }}"
-        aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_distribution_id }} --paths "/*"
+        echo "🔍 Searching for CloudFront distribution using bucket: ${{ inputs.bucket_name }}"
+
+        DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.bucket_name }}.s3.amazonaws.com' || DomainName=='${{ inputs.bucket_name }}.s3.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+
+        if [ -z "$DISTRIBUTION_ID" ]; then
+          echo "⚠️  No CloudFront distribution found for bucket: ${{ inputs.bucket_name }}"
+          echo "Skipping cache invalidation..."
+        else
+          echo "✅ Found CloudFront distribution: $DISTRIBUTION_ID"
+          echo "🚀 Creating cache invalidation..."
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          echo "✅ Cache invalidation completed!"
+        fi
