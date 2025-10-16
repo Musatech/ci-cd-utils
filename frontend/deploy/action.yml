@@ -1,64 +1,80 @@
 name: Run Code Quality Tools
-description: 'Run code quality tools on code'
+description: "Run code quality tools on code"
 
 inputs:
   node_version:
-    description: 'Node.js version'
+    description: "Node.js version"
     default: 18.x
   build_command:
-    description: 'Command to build project ex: (yarn build)'
+    description: "Command to build project ex: (yarn build)"
     required: true
   dist_folder:
-    description: 'Folder to deploy'
-    default: 'dist'
+    description: "Folder to deploy"
+    default: "dist"
   bucket_name:
-    description: 'S3 Bucket name'
+    description: "S3 Bucket name"
     required: true
   auth_token:
-    description: 'Auth token for private npm packages'
-    default: ''
+    description: "Auth token for private npm packages"
+    default: ""
   aws_region:
-    description: 'AWS region'
+    description: "AWS region"
     required: true
   aws_access_key_id:
-    description: 'AWS ACCESS_KEY_ID'
+    description: "AWS ACCESS_KEY_ID"
     required: true
   aws_secret_access_key:
-    description: 'AWS SECRET_ACCESS_KEY'
+    description: "AWS SECRET_ACCESS_KEY"
     required: true
-
+  enable_cloudfront_invalidation:
+    description: "Enable CloudFront cache invalidation (will auto-discover distribution)"
+    default: true
 
 runs:
   using: "composite"
   steps:
-  - name: Use Node.js ${{ inputs.node_version }}
-    uses: actions/setup-node@v3
-    with:
-      node-version: ${{ inputs.node_version }}
-      registry-url: https://npm.pkg.github.com
-      # cache: 'npm'
+    - name: Use Node.js ${{ inputs.node_version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+        registry-url: https://npm.pkg.github.com
+        # cache: 'npm'
 
-  - name: Install dependencies
-    shell: bash
-    run: yarn
-    env:
-      NODE_AUTH_TOKEN: ${{ inputs.auth_token }}
-  
-  - name: Build project
-    shell: bash
-    run: ${{ inputs.build_command }}
-  
-  - name: Configure AWS Credentials
-    uses: aws-actions/configure-aws-credentials@v1-node16
-    with:
-      aws-access-key-id: ${{ inputs.aws_access_key_id }}
-      aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
-      aws-region: ${{ inputs.aws_region }}
+    - name: Install dependencies
+      shell: bash
+      run: yarn
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.auth_token }}
 
-  - name: Deploy files to S3 bucket
-    shell: bash
-    run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
+    - name: Build project
+      shell: bash
+      run: ${{ inputs.build_command }}
 
-  # - name: Invalidate current CloudFront  # think about how to get this dynamic
-  #   shell: bash
-  #   run: aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_id }} --paths "/*"
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Deploy files to S3 bucket
+      shell: bash
+      run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
+
+    - name: Auto-discover and invalidate CloudFront cache
+      if: ${{ inputs.enable_cloudfront_invalidation == true || inputs.enable_cloudfront_invalidation == 'true' }}
+      shell: bash
+      run: |
+        echo "🔍 Searching for CloudFront distribution using bucket: ${{ inputs.bucket_name }}"
+
+        DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.bucket_name }}.s3.amazonaws.com' || DomainName=='${{ inputs.bucket_name }}.s3.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+
+        if [ -z "$DISTRIBUTION_ID" ]; then
+          echo "⚠️  No CloudFront distribution found for bucket: ${{ inputs.bucket_name }}"
+          echo "Skipping cache invalidation..."
+        else
+          echo "✅ Found CloudFront distribution: $DISTRIBUTION_ID"
+          echo "🚀 Creating cache invalidation..."
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          echo "✅ Cache invalidation completed!"
+        fi
