@@ -14,10 +14,10 @@ resource "aws_s3_bucket" "website" {
 resource "aws_s3_bucket_public_access_block" "public_access" {
   bucket = aws_s3_bucket.website.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 
   depends_on = [aws_s3_bucket.website]
 }
@@ -31,37 +31,34 @@ resource "aws_s3_bucket_cors_configuration" "cors" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.website.id
-
-  index_document {
-    suffix = "index.html"
-  }
-  error_document {
-    key = "index.html"
-  }
-}
 
 resource "aws_s3_bucket_policy" "public_acl" {
   bucket = aws_s3_bucket.website.id
 
-  policy = <<POLICY
-{
-  "Version" : "2012-10-17",
-  "Statement" : [
-    {
-      "Sid" : "PublicReadGetObject",
-      "Effect" : "Allow",
-      "Principal" : "*",
-      "Action" : "s3:*",
-      "Resource" : "arn:aws:s3:::${local.bucket_name}/*"
-    }
-  ]
-}
-POLICY
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontServicePrincipal"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "arn:aws:s3:::${local.bucket_name}/*"
+        Condition = {
+          StringLike = {
+            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
+          }
+        }
+      }
+    ]
+  })
 
   depends_on = [aws_s3_bucket.website, aws_s3_bucket_public_access_block.public_access]
 }
+
+data "aws_caller_identity" "current" {}
 
 #####
 ##   ACM
@@ -78,6 +75,13 @@ data "aws_acm_certificate" "cert" {
 ##   Cloudfront distribution
 ####
 
+resource "aws_cloudfront_origin_access_control" "website" {
+  name                              = local.bucket_name
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "website_distribution" {
   comment             = local.domain
   enabled             = true
@@ -87,8 +91,9 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   aliases = concat([local.domain], local.extra_domains)
 
   origin {
-    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
-    origin_id   = "origin-bucket-${aws_s3_bucket.website.id}"
+    domain_name              = aws_s3_bucket.website.bucket_regional_domain_name
+    origin_id                = "origin-bucket-${aws_s3_bucket.website.id}"
+    origin_access_control_id = aws_cloudfront_origin_access_control.website.id
   }
 
   default_cache_behavior {
