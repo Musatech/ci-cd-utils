@@ -47,8 +47,8 @@ resource "aws_s3_bucket_policy" "public_acl" {
         Action   = "s3:GetObject"
         Resource = "arn:aws:s3:::${local.bucket_name}/*"
         Condition = {
-          StringLike = {
-            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.website_distribution.arn
           }
         }
       }
@@ -57,8 +57,6 @@ resource "aws_s3_bucket_policy" "public_acl" {
 
   depends_on = [aws_s3_bucket.website, aws_s3_bucket_public_access_block.public_access]
 }
-
-data "aws_caller_identity" "current" {}
 
 #####
 ##   ACM
