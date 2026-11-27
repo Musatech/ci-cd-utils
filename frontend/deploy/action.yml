@@ -61,6 +61,22 @@ runs:
       shell: bash
       run: aws s3 sync ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --delete
 
+    # O sync não grava Cache-Control; sem ele o navegador reaproveita o index.html
+    # antigo por heurística e o deploy demora a chegar. Regrava só o que não tem hash
+    # no nome (html e arquivos fixos da raiz) com no-cache: o navegador revalida
+    # (304 se não mudou). Se não houver nenhum desses arquivos, não faz nada.
+    - name: Set Cache-Control no-cache on HTML and unhashed root files
+      shell: bash
+      run: |
+        aws s3 cp ./${{ inputs.dist_folder }} s3://${{ inputs.bucket_name }}/ --recursive \
+          --exclude "*" \
+          --include "*.html" \
+          --include "asset-manifest.json" \
+          --include "manifest.json" \
+          --include "service-worker.js" \
+          --include "sw.js" \
+          --cache-control "no-cache"
+
     - name: Auto-discover and invalidate CloudFront cache
       if: ${{ inputs.enable_cloudfront_invalidation == true || inputs.enable_cloudfront_invalidation == 'true' }}
       shell: bash
